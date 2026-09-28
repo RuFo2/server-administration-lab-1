@@ -1,0 +1,9 @@
+[Unit]
+Description=Backup /data/mydir to first FTP server found in subnet
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/backup.env
+ExecStart=/usr/local/bin/backup.sh /data/mydir 172.28.0.0/28

@@ -1,0 +1,47 @@
+networks:
+  labnet:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/28
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile
+    privileged: true
+    cgroup: host
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    networks:
+      labnet:
+        ipv4_address: 172.28.0.2
+
+  decoy1:
+    build:
+      context: docker/decoy
+    networks:
+      labnet:
+        ipv4_address: 172.28.0.3
+
+  decoy2:
+    build:
+      context: docker/decoy
+    networks:
+      labnet:
+        ipv4_address: 172.28.0.4
+
+  ftp:
+    image: fauria/vsftpd
+    environment:
+      FTP_USER: backupuser
+      FTP_PASS: backuppass
+      PASV_ADDRESS: 172.28.0.5
+      PASV_MIN_PORT: 21100
+      PASV_MAX_PORT: 21110
+    networks:
+      labnet:
+        ipv4_address: 172.28.0.5
